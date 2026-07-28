@@ -1,0 +1,11 @@
+const fs = require('fs');
+const path = require('path');
+const root = __dirname;
+const html = fs.readFileSync(path.join(root, 'index.html'), 'utf8');
+const css = fs.readFileSync(path.join(root, 'style.css'), 'utf8');
+const js = fs.readFileSync(path.join(root, 'script.js'), 'utf8');
+const worker = `const html=${JSON.stringify(html)};const css=${JSON.stringify(css)};const js=${JSON.stringify(js)};export default {fetch(request){const p=new URL(request.url).pathname;if(p==='/style.css')return new Response(css,{headers:{'content-type':'text/css; charset=utf-8'}});if(p==='/script.js')return new Response(js,{headers:{'content-type':'application/javascript; charset=utf-8'}});return new Response(html,{headers:{'content-type':'text/html; charset=utf-8'}})}};`;
+fs.mkdirSync(path.join(root, 'dist', 'server'), { recursive: true });
+fs.writeFileSync(path.join(root, 'dist', 'server', 'index.js'), worker);
+fs.mkdirSync(path.join(root, 'dist', '.openai'), { recursive: true });
+fs.copyFileSync(path.join(root, '.openai', 'hosting.json'), path.join(root, 'dist', '.openai', 'hosting.json'));

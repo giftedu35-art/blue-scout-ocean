@@ -1,0 +1,81 @@
+<!doctype html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>BLUE SCOUT | 해양 생태 탐험</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Nanum+Myeongjo:wght@700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="style.css" />
+  <style>
+    .feedback-card{display:flex;gap:11px;margin-top:12px;padding:13px;border-radius:14px;background:#fff0d7;color:#80521b}.feedback-card.geo{background:#ece7ff;color:#614b96}.feedback-icon{flex:0 0 25px;height:25px;border-radius:50%;background:#ef8657;color:#fff;display:grid;place-items:center;font-weight:bold}.geo .feedback-icon{background:#9475ce}.feedback-card p{font-size:10px;font-weight:700;letter-spacing:.4px;margin:0 0 3px}.feedback-card strong,.feedback-card small{display:block}.feedback-card strong{font-size:12px}.feedback-card small{font-size:10px;line-height:1.45;margin-top:4px;opacity:.82}
+    .status-grid{display:grid;grid-template-columns:1fr 1fr;gap:9px;margin-top:16px}.status-grid div{padding:10px 11px;background:#eef6f3;border-radius:11px}.status-grid small{display:block;color:#789497;font-size:9px}.status-grid b{display:block;margin-top:4px;font-size:12px;color:#126e66}.status-grid div:last-child{background:#fff1dd}.status-grid div:last-child b{color:#a5661b}.book-guide{margin:0 0 12px;color:#6b8b8f;font-size:10px;line-height:1.5}
+    .game-status{display:flex;gap:10px;align-items:center;background:linear-gradient(125deg,#e1f5ef,#e6f1fa);padding:13px;border-radius:15px;margin-bottom:24px}.avatar{width:43px;height:43px;display:grid;place-items:center;border-radius:50%;background:#0b777b;font-size:21px}.game-info{flex:1}.game-info p{margin:0 0 5px;font-size:10px;color:#3f686d}.game-info p b{color:#08776e}.xp-track{height:7px;background:#c7dfdd;border-radius:8px;overflow:hidden}.xp-track i{display:block;height:100%;width:62%;background:linear-gradient(90deg,#11a38e,#f4bd45);border-radius:8px}.game-info small{display:block;margin-top:4px;font-size:9px;color:#6d898c}.rank{font-size:8px;line-height:1.1;text-align:center;color:#599097;font-weight:bold}.rank b{color:#14736e;font-size:10px}.badge-title{margin-top:25px}.badges{display:flex;gap:9px;margin-top:13px;padding-bottom:4px}.badges article{flex:1;background:#fff;border-radius:12px;padding:9px;text-align:center;box-shadow:0 2px 10px #0b4e540a}.badges div{font-size:23px}.badges b,.badges small{display:block}.badges b{font-size:10px;margin-top:4px}.badges small{font-size:8px;color:#79969a;margin-top:2px}.locked-badge{opacity:.48}.locked-badge div{color:#92a9aa}.hero:after{pointer-events:none}.hero .primary{z-index:2}
+  </style>
+<style>.ranking-title{margin-top:24px}.ranking{margin-top:12px;padding:13px;display:flex;align-items:center;gap:11px;background:linear-gradient(120deg,#0b6472,#128b8b);border-radius:15px;color:#fff}.rank-me{width:42px;height:42px;border-radius:12px;background:#f7cb52;color:#16434a;display:flex;align-items:baseline;justify-content:center;gap:1px;font-weight:800}.rank-me span{font-size:21px}.rank-me small{font-size:9px}.rank-copy{flex:1}.rank-copy b,.rank-copy small{display:block}.rank-copy b{font-size:13px}.rank-copy small{margin-top:4px;color:#cfefea;font-size:10px}.rank-medal{font-size:27px}.rank-list{background:#fff;border-radius:0 0 14px 14px;padding:7px 12px;box-shadow:0 3px 12px #0a4b510b}.rank-list div{display:flex;align-items:center;gap:9px;padding:6px 0;font-size:10px}.rank-list b{width:14px;color:#cb9332}.rank-list span{flex:1}.rank-list em{font-style:normal;color:#578187;font-weight:bold}</style>
+</head>
+<body>
+  <main class="app">
+    <header>
+      <div class="brand"><span class="logo">◒</span><div><strong>BLUE SCOUT</strong><small>바다를 발견하고 지키는 여행</small></div></div>
+      <div class="points">✦ <span id="pointTotal">0</span> P</div>
+    </header>
+
+    <section id="homeScreen">
+      <section class="hero">
+        <p class="eyebrow">OCEAN ECO EXPLORER</p>
+        <h1>바다를 찍고,<br><em>지키는 탐험</em>을 시작해요.</h1>
+        <p>외래종·교란종·위협종과 지질을 사진으로 기록하고<br>AI의 설명과 보상을 받아보세요.</p>
+        <button class="primary" id="openCamera">⌁ 사진으로 탐험 시작</button>
+      </section>
+      <section class="content">
+        <article class="game-status"><div class="avatar">🌊</div><div class="game-info"><p>탐험가 레벨 <b id="levelNumber">1</b> · <span id="streak">0일</span> 연속 탐험</p><div class="xp-track"><i id="xpBar"></i></div><small><b id="xpNow">0</b> / 1,000 XP · 다음 레벨까지 <span id="xpLeft">1,000</span> XP</small></div><div class="rank">NEW<br><b>SCOUT</b></div></article>
+        <div class="section-title"><h2>오늘의 탐험 미션</h2><span>주간 보상</span></div>
+        <article class="mission"><div class="mission-icon">⌖</div><div><p class="eyebrow">WEEKLY MISSION</p><h3>낯선 손님을 찾아라</h3><p>외래·교란종 1종을 기록하면 <b>+150P</b></p></div><b class="mission-count"><span id="missionCount">0</span><small>/5</small></b></article>
+        <div class="section-title ranking-title"><h2>이번 주 탐험 랭킹</h2><span>로컬 챌린지</span></div>
+        <article class="ranking" id="rankingCard"><div class="rank-me"><span id="rankPlace">-</span><small>위</small></div><div class="rank-copy"><b id="rankTitle">아직 참가자가 없어요</b><small id="rankDescription">첫 탐험 기록을 남기고 1위가 되어보세요.</small></div><div class="rank-medal">🏆</div></article>
+        <div class="rank-list" id="rankList"><div><b>·</b><span>이번 주 탐험가를 기다리고 있어요</span><em>0P</em></div></div>
+        <div class="section-title book-title"><h2>탐험 도감</h2><button id="showBook">전체 보기 ›</button></div>
+        <div class="book-row" id="homeBook"><article class="mini-card locked-badge"><div>?</div><b>아직 비어 있어요</b><small>첫 사진을 기록해 보세요</small></article><article class="mini-card locked-badge"><div>?</div><b>미지의 생물</b><small>탐험에서 발견하세요</small></article><article class="mini-card locked-badge"><div>?</div><b>미지의 지질</b><small>탐험에서 발견하세요</small></article></div>
+        <div class="section-title badge-title"><h2>획득 배지</h2><span id="badgeCount">0 / 6</span></div>
+        <div class="badges" id="badges"><article class="locked-badge"><div>?</div><b>첫 발견</b><small>생물 1종 기록</small></article><article class="locked-badge"><div>?</div><b>바다 지킴이</b><small>위험종 안전 기록</small></article><article class="locked-badge"><div>?</div><b>희귀 추적자</b><small>희귀종 3종 기록</small></article></div>
+      </section>
+    </section>
+
+    <section id="cameraScreen" class="hidden camera-screen">
+      <button class="close" id="closeCamera" aria-label="닫기">×</button>
+      <div class="viewfinder"><span id="previewEmoji">🌊</span><i class="scan-line"></i><b class="corner tl"></b><b class="corner tr"></b><b class="corner bl"></b><b class="corner br"></b></div>
+      <h2>무엇을 발견했나요?</h2><p>생물 또는 지질을 프레임 안에 담아주세요.<br>AI가 특징을 분석해 알려드려요.</p>
+      <label class="primary capture" for="cameraInput">◉ 바로 사진 찍기</label>
+      <label class="gallery" for="fileInput">▧ 앨범에서 사진 선택</label>
+      <input id="cameraInput" type="file" accept="image/*" capture="environment" hidden>
+      <input id="fileInput" type="file" accept="image/*" hidden>
+      <button class="demo" id="demoScan">예시 데이터로 앱 흐름 보기</button>
+    </section>
+
+    <section id="resultScreen" class="hidden result content">
+      <button class="back" id="backHome">← 탐험으로 돌아가기</button>
+      <div class="result-image" id="resultVisual"><span id="resultEmoji">🐠</span><span class="confidence">✦ AI 인식 <b id="confidence">96</b>%</span></div>
+      <div class="result-heading"><div><p id="typeLabel" class="eyebrow coral">외래종 · 주의</p><h1 id="speciesName">가시성대</h1><i id="latinName">Pterois volitans</i></div><div class="rarity">✦<b id="rarity">희귀</b></div></div>
+      <div class="status-grid"><div><small>발견 희귀도</small><b>✦ <span id="rarityStatus">희귀</span></b></div><div><small>생태 위험도</small><b id="riskStatus">주의</b></div></div>
+      <p class="description" id="description"></p>
+      <article class="ai-box"><span>✦</span><div><b>AI 탐험 가이드</b><p id="guide"></p></div></article>
+      <article id="feedbackCard" class="feedback-card"><div class="feedback-icon">!</div><div><p id="feedbackTitle">AI 안전 피드백</p><strong id="feedbackAction"></strong><small id="feedbackDetail"></small></div></article>
+      <button class="reward" id="saveRecord">🏆 기록 저장하고 <span id="rewardPoint">120</span>P · <span id="rewardXp">80</span> XP 받기</button>
+      <div class="facts"><span>발견 유형</span><b id="factType">외래종 · 주의</b><span>도감 상태</span><b>새로운 발견!</b></div>
+    </section>
+
+    <section id="bookScreen" class="hidden content book-screen">
+      <button class="back" id="bookBack">← 홈으로</button><p class="eyebrow">MY BLUE BOOK</p><h1>탐험 도감</h1>
+      <div class="level"><span>탐험가 레벨 4</span><i><b></b></i><strong>62%</strong></div>
+      <div class="filters"><button class="selected">전체</button><button>생물</button><button>지질</button><button>희귀</button></div>
+      <p class="book-guide">희귀도는 발견 난이도, 위험도는 생태계와 사람에게 미치는 영향을 뜻해요.</p><div id="bookList"></div>
+    </section>
+    <nav><button id="homeNav" class="active">⌂<span>홈</span></button><button id="cameraNav" class="nav-camera">⌁</button><button id="bookNav">▤<span>도감</span></button></nav>
+    <div id="toast" class="toast hidden"></div>
+  </main>
+  <script src="script.js"></script>
+  <script src="persistence.js"></script>
+  <script src="vision-guard.js"></script>
+</body>
+</html>

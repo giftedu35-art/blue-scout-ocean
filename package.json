@@ -1,0 +1,6 @@
+{
+  "name": "blue-scout-ocean",
+  "private": true,
+  "version": "1.0.0",
+  "scripts": { "build": "node build.cjs" }
+}
