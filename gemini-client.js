@@ -50,3 +50,4 @@ async function analyzePhotoWithGemini(file) {
 
 $('fileInput').onchange = (event) => { if (event.target.files[0]) analyzePhotoWithGemini(event.target.files[0]); };
 $('cameraInput').onchange = (event) => { if (event.target.files[0]) analyzePhotoWithGemini(event.target.files[0]); };
+Connect Gemini photo recognition
