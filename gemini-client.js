@@ -1,5 +1,5 @@
 // Gemini API key stays in Apps Script. The browser only sends the selected image.
-const BLUE_SCOUT_AI_ENDPOINT = 'https://script.google.com/macros/s/AKfycbw1no10FXgbZhzpAeUwCAFR1hC_8-B4wg3Yfj70gEYHchAzx357hwLdREScnIR_E1Ur/exec';
+const BLUE_SCOUT_AI_ENDPOINT = 'https://script.google.com/macros/s/AKfycbxvyo59LsqRySBpinKRk6lOKrzBlTT7FSu0-xAygrpsmy3s7eOutUlYY4_5dFhSvxGe/exec';
 
 function readImageForAi(file) {
   return new Promise((resolve, reject) => {
