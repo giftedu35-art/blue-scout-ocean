@@ -17,6 +17,7 @@
 <style>
   .report-button{width:100%;margin:10px 0 0;padding:13px 14px;border:1px solid #e56d55;border-radius:13px;background:#fff5f1;color:#b74432;font-weight:800;cursor:pointer}
   .report-note{margin:7px 4px 0;color:#7c8f91;font-size:9px;line-height:1.45;text-align:center}
+  .auth-box{display:flex;flex-direction:column;align-items:center;gap:2px}.auth-box button{border:0;border-radius:11px;background:#e7f4f1;color:#08736f;padding:7px 9px;font-size:9px;font-weight:800;cursor:pointer}.auth-box small{max-width:72px;color:#6b898d;font-size:7px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 </style>
 </head>
 <body>
@@ -24,6 +25,7 @@
     <header>
       <div class="brand"><span class="logo">◒</span><div><strong>BLUE SCOUT</strong><small>바다를 발견하고 지키는 여행</small></div></div>
       <div class="points">✦ <span id="pointTotal">0</span> P</div>
+      <div class="auth-box"><button id="authButton">Google 로그인</button><small id="authUser">체험 모드</small></div>
     </header>
 
     <section id="homeScreen">
@@ -91,10 +93,14 @@
     <div id="toast" class="toast hidden"></div>
   </main>
   <script src="script.js"></script>
-  <script src="persistence.js?v=20260729-6"></script>
+  <script src="persistence.js?v=20260729-7"></script>
   <script src="vision-guard.js"></script>
   <script src="invasive-species.js?v=20260729-1"></script>
   <script src="gemini-client.js?v=20260729-7"></script>
   <script src="custom-species.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-auth-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore-compat.js"></script>
+  <script src="firebase-auth.js?v=20260729-1"></script>
 </body>
 </html>
