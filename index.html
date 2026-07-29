@@ -26,7 +26,7 @@
       <section class="hero">
         <p class="eyebrow">OCEAN ECO EXPLORER</p>
         <h1>바다를 찍고,<br><em>지키는 탐험</em>을 시작해요.</h1>
-        <p>외래종·교란종·위협종과 지질을 사진으로 기록하고<br>AI의 설명과 보상을 받아보세요.</p>
+        <p>외래종·교란종·위협종과 지형·지질을 사진으로 기록하고<br>AI의 설명과 보상을 받아보세요.</p>
         <button class="primary" id="openCamera">⌁ 사진으로 탐험 시작</button>
       </section>
       <section class="content">
@@ -46,7 +46,7 @@
     <section id="cameraScreen" class="hidden camera-screen">
       <button class="close" id="closeCamera" aria-label="닫기">×</button>
       <div class="viewfinder"><span id="previewEmoji">🌊</span><i class="scan-line"></i><b class="corner tl"></b><b class="corner tr"></b><b class="corner bl"></b><b class="corner br"></b></div>
-      <h2>무엇을 발견했나요?</h2><p>생물 또는 지질을 프레임 안에 담아주세요.<br>AI가 특징을 분석해 알려드려요.</p>
+      <h2>무엇을 발견했나요?</h2><p>생태계 생물 또는 지형·지질을 프레임 안에 담아주세요.<br>AI가 특징을 분석해 알려드려요.</p>
       <label class="primary capture" for="cameraInput">◉ 바로 사진 찍기</label>
       <label class="gallery" for="fileInput">▧ 앨범에서 사진 선택</label>
       <input id="cameraInput" type="file" accept="image/*" capture="environment" hidden>
@@ -73,7 +73,7 @@
         <button class="selected" data-filter="all">전체</button>
         <button data-filter="animal">생물</button>
         <button data-filter="terrain">지형</button>
-        <button data-filter="invasive">외래종</button>
+        <button data-filter="invasive">외래·교란종</button>
         <button data-filter="rare-high">희귀도 높음</button>
         <button data-filter="rare-medium">희귀도 보통</button>
         <button data-filter="rare-low">희귀도 낮음</button>
@@ -84,9 +84,10 @@
     <div id="toast" class="toast hidden"></div>
   </main>
   <script src="script.js"></script>
-  <script src="persistence.js?v=20260729-4"></script>
+  <script src="persistence.js?v=20260729-5"></script>
   <script src="vision-guard.js"></script>
-  <script src="gemini-client.js?v=20260729-3"></script>
+  <script src="invasive-species.js?v=20260729-1"></script>
+  <script src="gemini-client.js?v=20260729-4"></script>
   <script src="custom-species.js"></script>
 </body>
 </html>
