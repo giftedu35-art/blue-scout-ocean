@@ -41,7 +41,11 @@ function showAiResult(result, previewUrl) {
   current = { name: result.name, latin: result.latin || '', type: result.category || '미확인', rarity: result.rarity || '-', risk: result.risk || '확인 필요', score: Number(result.confidence) || 0, emoji: '🔎', points: Number(result.points) || 0, xp: 80, description: result.description || '', guide: result.guide || '' };
   const isTerrain = /지형|지질|절리|암석/.test(current.type);
   const resultVisual = $('resultVisual');
-  resultVisual.style.backgroundImage = previewUrl ? `url("${previewUrl}")` : '';
+  const resultPhoto = $('resultPhoto');
+  resultPhoto.src = previewUrl || '';
+  resultPhoto.classList.toggle('hidden', !previewUrl);
+  $('resultEmoji').classList.toggle('hidden', Boolean(previewUrl));
+  resultVisual.style.backgroundImage = '';
   resultVisual.classList.toggle('has-photo', Boolean(previewUrl));
   $('riskCard').classList.toggle('hidden', isTerrain);
   $('statusGrid').style.gridTemplateColumns = isTerrain ? '1fr' : '1fr 1fr';
