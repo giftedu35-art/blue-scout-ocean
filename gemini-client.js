@@ -2,16 +2,24 @@ const BLUE_SCOUT_AI_ENDPOINT = 'https://script.google.com/macros/s/AKfycbxvyo59L
 const BLUE_SCOUT_INVASIVE_REPORT_URL = 'https://kias.nie.re.kr/page/report/guide';
 const BLUE_SCOUT_ENDANGERED_INFO_URL = 'https://species.nibr.go.kr/endangeredspecies/rehome/exlist/exlist.jsp';
 
-function imageData(file) {
-  return new Promise((resolve, reject) => {
-    const reader = new FileReader();
-    reader.onerror = () => reject(new Error('사진을 읽을 수 없어요.'));
-    reader.onload = () => {
-      const [head, data] = String(reader.result).split(',');
-      resolve({ data, mimeType: (head.match(/data:(.*?);/) || [])[1] || 'image/jpeg', previewUrl: String(reader.result) });
-    };
-    reader.readAsDataURL(file);
-  });
+async function imageData(file) {
+  const bitmap = await createImageBitmap(file);
+  const maxSide = 1280;
+  const scale = Math.min(1, maxSide / Math.max(bitmap.width, bitmap.height));
+  const width = Math.max(1, Math.round(bitmap.width * scale));
+  const height = Math.max(1, Math.round(bitmap.height * scale));
+  const canvas = document.createElement('canvas');
+  canvas.width = width;
+  canvas.height = height;
+  const context = canvas.getContext('2d', { alpha: false });
+  context.fillStyle = '#ffffff';
+  context.fillRect(0, 0, width, height);
+  context.drawImage(bitmap, 0, 0, width, height);
+  bitmap.close();
+  const previewUrl = canvas.toDataURL('image/jpeg', 0.8);
+  const [, data = ''] = previewUrl.split(',');
+  if (!data) throw new Error('사진을 읽을 수 없어요.');
+  return { data, mimeType: 'image/jpeg', previewUrl };
 }
 
 function queryResult(token) {
@@ -31,8 +39,8 @@ async function analyzePhotoWithGemini(file) {
   const frame = document.createElement('iframe'); frame.name = `blueScoutUpload${token}`; frame.hidden = true; document.body.appendChild(frame);
   const form = document.createElement('form'); form.method = 'POST'; form.action = BLUE_SCOUT_AI_ENDPOINT; form.target = frame.name;
   const field = document.createElement('textarea'); field.name = 'payload'; field.value = JSON.stringify({ image: photo.data, mimeType: photo.mimeType, token }); form.appendChild(field); document.body.appendChild(form); form.submit();
-  for (let i = 0; i < 25; i++) {
-    await new Promise((r) => setTimeout(r, 1200)); const data = await queryResult(token);
+  for (let i = 0; i < 32; i++) {
+    await new Promise((r) => setTimeout(r, i === 0 ? 500 : 850)); const data = await queryResult(token);
     if (!data.pending) { frame.remove(); form.remove(); if (!data.ok) throw new Error(data.error || 'AI 분석에 실패했어요.'); return showAiResult(data.result, photo.previewUrl); }
   }
   frame.remove(); form.remove(); throw new Error('AI 분석 시간이 초과됐어요.');
