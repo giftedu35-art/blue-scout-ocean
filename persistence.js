@@ -29,9 +29,12 @@ function matchesBookFilter(entry, filter) {
 function renderSavedBook(filter = activeBookFilter) {
   activeBookFilter = filter;
   const list = $('bookList');
-  const allEntries = discoveredEntries.length
-    ? discoveredEntries
-    : [...recorded].map((name) => {
+  const knownNames = new Set(discoveredEntries.map((entry) => entry.name));
+  const allEntries = [
+    ...discoveredEntries,
+    ...[...recorded]
+      .filter((name) => !knownNames.has(name))
+      .map((name) => {
         const sample = samples.find((item) => item.name === name);
         return sample || {
           name,
@@ -40,7 +43,8 @@ function renderSavedBook(filter = activeBookFilter) {
           risk: '-',
           emoji: '🔎'
         };
-      });
+      })
+  ];
   const entries = allEntries.filter((entry) =>
     matchesBookFilter(entry, activeBookFilter)
   );
@@ -138,6 +142,87 @@ window.renderBlueScoutSharedRanking = (players, currentUid) => {
   }).join('');
 };
 
+function renderHomeBook() {
+  const recent = discoveredEntries.slice(-3).reverse();
+  const placeholders = [
+    ['미지의 생물', '탐험에서 발견하세요'],
+    ['미지의 지형', '해안 지형을 찾아보세요'],
+    ['새로운 발견', '사진을 기록해 보세요']
+  ];
+  const cards = [];
+  for (let index = 0; index < 3; index += 1) {
+    const entry = recent[index];
+    if (entry) {
+      cards.push(`<article class="mini-card">
+        <div>${discoveryEmoji(entry)}</div>
+        <b>${String(entry.name || '기록된 발견').replace(/[<>&"']/g, '')}</b>
+        <small>${String(entry.type || '탐험 기록').replace(/[<>&"']/g, '')}</small>
+      </article>`);
+    } else {
+      const placeholder = placeholders[index];
+      cards.push(`<article class="mini-card locked-badge">
+        <div>?</div><b>${placeholder[0]}</b><small>${placeholder[1]}</small>
+      </article>`);
+    }
+  }
+  $('homeBook').innerHTML = cards.join('');
+}
+
+function renderBadges() {
+  const rareCount = discoveredEntries.filter((entry) =>
+    /높음|희귀/.test(entry.rarity || '')
+  ).length;
+  const badges = [
+    {
+      icon: '🐠',
+      name: '첫 발견',
+      detail: '생물·지형 1종 기록',
+      unlocked: records >= 1
+    },
+    {
+      icon: '🛡️',
+      name: '생태 지킴이',
+      detail: '외래·교란·위기종 기록',
+      unlocked: discoveredEntries.some((entry) =>
+        /외래|교란|멸종위기/.test(entry.type || '')
+      )
+    },
+    {
+      icon: '💎',
+      name: '희귀 추적자',
+      detail: '희귀도 높음 3종',
+      unlocked: rareCount >= 3
+    },
+    {
+      icon: '🪨',
+      name: '지형 탐험가',
+      detail: '해안 지형 1곳 기록',
+      unlocked: discoveredEntries.some(isTerrainEntry)
+    },
+    {
+      icon: '🧭',
+      name: '현장 전문가',
+      detail: '발견 5종 기록',
+      unlocked: records >= 5
+    },
+    {
+      icon: '🏆',
+      name: '블루 마스터',
+      detail: '발견 10종 기록',
+      unlocked: records >= 10
+    }
+  ];
+  const unlockedCount = badges.filter((badge) => badge.unlocked).length;
+  $('badgeCount').textContent = `${unlockedCount} / ${badges.length}`;
+  $('badges').innerHTML = badges.map((badge) =>
+    `<article${badge.unlocked ? '' : ' class="locked-badge"'}>
+      <div>${badge.unlocked ? badge.icon : '?'}</div>
+      <b>${badge.name}</b>
+      <small>${badge.unlocked ? '획득 완료!' : badge.detail}</small>
+    </article>`
+  ).join('');
+}
+
 function updateSavedProgress() {
   $('pointTotal').textContent = points.toLocaleString();
   $('levelNumber').textContent = level;
@@ -145,13 +230,8 @@ function updateSavedProgress() {
   $('xpLeft').textContent = (1000 - xp).toLocaleString();
   $('xpBar').style.width = `${Math.max(0, Math.min(xp / 10, 100))}%`;
   $('missionCount').textContent = Math.min(records, 5);
-  $('badgeCount').textContent = `${Math.min(records, 3)} / 6`;
-
-  if (records > 0) {
-    $('badges').innerHTML = '<article><div>🐠</div><b>첫 발견</b><small>생물 1종 기록</small></article><article class="locked-badge"><div>?</div><b>바다 지킴이</b><small>위험종 안전 기록</small></article><article class="locked-badge"><div>?</div><b>희귀 추적자</b><small>희귀종 3종 기록</small></article>';
-  } else {
-    $('badges').innerHTML = '<article class="locked-badge"><div>?</div><b>첫 발견</b><small>생물 1종 기록</small></article><article class="locked-badge"><div>?</div><b>바다 지킴이</b><small>위험종 안전 기록</small></article><article class="locked-badge"><div>?</div><b>희귀 추적자</b><small>희귀종 3종 기록</small></article>';
-  }
+  renderHomeBook();
+  renderBadges();
   updateRanking();
 }
 
@@ -179,6 +259,7 @@ function loadSavedProgress() {
   discoveredEntries = Array.isArray(saved.discoveries)
     ? saved.discoveries
     : [];
+  records = Math.max(records, recorded.size, discoveredEntries.length);
   window.blueScoutWeeklyPoints = saved.weekId === currentWeekId() ? (Number(saved.weeklyPoints) || 0) : 0;
   updateSavedProgress();
   saveCurrentProgress();
@@ -214,6 +295,7 @@ function applyBlueScoutProgress(saved) {
   discoveredEntries = Array.isArray(progress.discoveries)
     ? progress.discoveries
     : [];
+  records = Math.max(records, recorded.size, discoveredEntries.length);
   window.blueScoutWeeklyPoints = progress.weekId === currentWeekId()
     ? Number(progress.weeklyPoints) || 0
     : 0;
