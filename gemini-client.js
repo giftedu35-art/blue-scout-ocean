@@ -40,6 +40,9 @@ function showAiResult(result, previewUrl) {
   if (!result.recognized) result = { ...result, name: '해양 생물로 확인되지 않았어요', latin: 'Not a marine target', category: '미확인', rarity: '-', risk: '재촬영 필요', confidence: 0, points: 0, description: '해양 생물·물고기·지질 대상을 확인하기 어려워요.', guide: '대상이 크게 보이도록 다시 촬영해 주세요.' };
   current = { name: result.name, latin: result.latin || '', type: result.category || '미확인', rarity: result.rarity || '-', risk: result.risk || '확인 필요', score: Number(result.confidence) || 0, emoji: '🔎', points: Number(result.points) || 0, xp: 80, description: result.description || '', guide: result.guide || '' };
   const isTerrain = /지형|지질|절리|암석/.test(current.type);
+  $('bookStatus').textContent = recorded.has(current.name)
+    ? '이미 찾은 발견!'
+    : '새로운 발견!';
   const resultVisual = $('resultVisual');
   const resultPhoto = $('resultPhoto');
   resultPhoto.src = previewUrl || '';
