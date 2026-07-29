@@ -24,7 +24,7 @@ function queryResult(token) {
 }
 
 async function analyzePhotoWithGemini(file) {
-  $('toast').textContent = 'AI가 사진을 분석하고 있어요…'; $('toast').classList.remove('hidden');
+  $('toast').classList.add('hidden');
   const photo = await imageData(file); const token = `${Date.now()}${Math.random().toString(36).slice(2)}`;
   const frame = document.createElement('iframe'); frame.name = `blueScoutUpload${token}`; frame.hidden = true; document.body.appendChild(frame);
   const form = document.createElement('form'); form.method = 'POST'; form.action = BLUE_SCOUT_AI_ENDPOINT; form.target = frame.name;
