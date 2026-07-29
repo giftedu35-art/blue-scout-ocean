@@ -109,6 +109,7 @@ blueScoutAuth.onAuthStateChanged(async (user) => {
       blueScoutApplyingCloud = true;
       window.applyBlueScoutProgress(cloud.data());
       blueScoutApplyingCloud = false;
+      await blueScoutSaveCloud(window.getBlueScoutProgress());
       blueScoutAuthMessage('계정 기록을 불러왔어요.');
     } else {
       await blueScoutSaveCloud(window.getBlueScoutProgress());
