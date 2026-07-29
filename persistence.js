@@ -18,7 +18,7 @@ function discoveryEmoji(entry) {
 function matchesBookFilter(entry, filter) {
   if (filter === 'animal') return !isTerrainEntry(entry);
   if (filter === 'terrain') return isTerrainEntry(entry);
-  if (filter === 'invasive') return /외래/.test(entry.type || '');
+  if (filter === 'invasive') return /외래|교란/.test(entry.type || '');
   if (filter === 'rare-high') return /높음|희귀/.test(entry.rarity || '');
   if (filter === 'rare-medium') return /보통/.test(entry.rarity || '');
   if (filter === 'rare-low') return /낮음|일반/.test(entry.rarity || '');
