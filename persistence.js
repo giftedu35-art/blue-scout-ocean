@@ -104,6 +104,40 @@ function updateRanking() {
     : '<div><b>·</b><span>이번 주 탐험가를 기다리고 있어요</span><em>0P</em></div>';
 }
 
+window.renderBlueScoutSharedRanking = (players, currentUid) => {
+  const ranked = (Array.isArray(players) ? players : [])
+    .filter((player) =>
+      player &&
+      player.weekId === currentWeekId() &&
+      Number(player.weeklyPoints) > 0
+    )
+    .sort((a, b) => Number(b.weeklyPoints) - Number(a.weeklyPoints))
+    .slice(0, 20);
+
+  if (!ranked.length) {
+    $('rankPlace').textContent = '-';
+    $('rankTitle').textContent = '아직 참가자가 없어요';
+    $('rankDescription').textContent = '사진을 기록하면 전체 랭킹에 참가할 수 있어요.';
+    $('rankList').innerHTML =
+      '<div><b>·</b><span>이번 주 탐험가를 기다리고 있어요</span><em>0P</em></div>';
+    return;
+  }
+
+  const myIndex = ranked.findIndex((player) => player.uid === currentUid);
+  $('rankPlace').textContent = myIndex >= 0 ? String(myIndex + 1) : '-';
+  $('rankTitle').textContent =
+    myIndex >= 0 ? `이번 주 전체 ${myIndex + 1}위` : '이번 주 전체 탐험 랭킹';
+  $('rankDescription').textContent =
+    myIndex >= 0
+      ? `${Number(ranked[myIndex].weeklyPoints).toLocaleString()}P · 발견 ${Number(ranked[myIndex].records) || 0}종`
+      : '사진을 기록하면 전체 랭킹에 참가할 수 있어요.';
+  $('rankList').innerHTML = ranked.map((player, index) => {
+    const name = String(player.displayName || 'BLUE SCOUT 탐험가')
+      .replace(/[<>&"']/g, '');
+    return `<div><b>${index + 1}</b><span>${name}${player.uid === currentUid ? ' (나)' : ''}</span><em>${Number(player.weeklyPoints).toLocaleString()}P</em></div>`;
+  }).join('');
+};
+
 function updateSavedProgress() {
   $('pointTotal').textContent = points.toLocaleString();
   $('levelNumber').textContent = level;
