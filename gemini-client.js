@@ -104,11 +104,13 @@ function showAiResult(result, previewUrl) {
   };
 
   const resultVisual = $('resultVisual');
-  resultVisual.style.backgroundImage = previewUrl ? `url("${previewUrl}")` : '';
+  const isMackerel = /고등어|mackerel/i.test(`${current.name} ${current.latin}`);
+  const illustrationUrl = isMackerel ? './assets/cute-mackerel.png' : '';
+  resultVisual.style.backgroundImage = illustrationUrl ? `url("${illustrationUrl}")` : '';
   resultVisual.style.backgroundPosition = 'center';
   resultVisual.style.backgroundSize = 'cover';
   resultVisual.style.backgroundRepeat = 'no-repeat';
-  $('resultEmoji').style.opacity = previewUrl ? '0' : '1';
+  $('resultEmoji').style.opacity = illustrationUrl ? '0' : '1';
 
   $('resultEmoji').textContent = current.emoji;
   $('speciesName').textContent = current.name;
