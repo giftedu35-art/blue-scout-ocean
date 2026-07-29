@@ -3,6 +3,7 @@
 const BLUE_SCOUT_SAVE = 'blue-scout-progress-v2';
 const BLUE_SCOUT_LEGACY_SAVE = 'blue-scout-progress-v1';
 let discoveredEntries = [];
+let activeBookFilter = 'all';
 
 function isTerrainEntry(entry) {
   return /지형|지질|절리|암석/.test(entry.type || '');
@@ -14,9 +15,20 @@ function discoveryEmoji(entry) {
   return entry.emoji || '🐟';
 }
 
-function renderSavedBook() {
+function matchesBookFilter(entry, filter) {
+  if (filter === 'animal') return !isTerrainEntry(entry);
+  if (filter === 'terrain') return isTerrainEntry(entry);
+  if (filter === 'invasive') return /외래/.test(entry.type || '');
+  if (filter === 'rare-high') return /높음|희귀/.test(entry.rarity || '');
+  if (filter === 'rare-medium') return /보통/.test(entry.rarity || '');
+  if (filter === 'rare-low') return /낮음|일반/.test(entry.rarity || '');
+  return true;
+}
+
+function renderSavedBook(filter = activeBookFilter) {
+  activeBookFilter = filter;
   const list = $('bookList');
-  const entries = discoveredEntries.length
+  const allEntries = discoveredEntries.length
     ? discoveredEntries
     : [...recorded].map((name) => {
         const sample = samples.find((item) => item.name === name);
@@ -28,6 +40,16 @@ function renderSavedBook() {
           emoji: '🔎'
         };
       });
+  const entries = allEntries.filter((entry) =>
+    matchesBookFilter(entry, activeBookFilter)
+  );
+
+  document.querySelectorAll('#bookFilters button').forEach((button) => {
+    button.classList.toggle(
+      'selected',
+      button.dataset.filter === activeBookFilter
+    );
+  });
 
   list.innerHTML = entries.length
     ? entries.map((entry) => {
@@ -44,7 +66,14 @@ function renderSavedBook() {
           <span class="badge">${entry.rarity || '-'}</span>
         </article>`;
       }).join('')
-    : '<article class="entry locked"><div class="emoji">?</div><section><p>도감이 비어 있어요</p><b>첫 탐험을 시작해 보세요</b><small>사진을 기록하면 도감이 열립니다</small></section></article>';
+    : `<article class="entry locked">
+        <div class="emoji">?</div>
+        <section>
+          <p>${allEntries.length ? '해당 분류의 기록이 없어요' : '도감이 비어 있어요'}</p>
+          <b>${allEntries.length ? '다른 필터를 선택해 보세요' : '첫 탐험을 시작해 보세요'}</b>
+          <small>${allEntries.length ? '새로운 발견을 기록하면 이 목록에 추가됩니다' : '사진을 기록하면 도감이 열립니다'}</small>
+        </section>
+      </article>`;
 
   screen('bookScreen');
 }
@@ -179,5 +208,8 @@ $('saveRecord').onclick = () => {
 };
 
 loadSavedProgress();
-$('showBook').onclick = renderSavedBook;
-$('bookNav').onclick = renderSavedBook;
+$('showBook').onclick = () => renderSavedBook('all');
+$('bookNav').onclick = () => renderSavedBook('all');
+document.querySelectorAll('#bookFilters button').forEach((button) => {
+  button.onclick = () => renderSavedBook(button.dataset.filter);
+});
