@@ -15,6 +15,7 @@ blueScoutGoogle.setCustomParameters({ prompt: 'select_account' });
 
 let blueScoutApplyingCloud = false;
 let blueScoutSaveTimer = null;
+let blueScoutRankingUnsubscribe = null;
 
 function blueScoutAuthMessage(message) {
   const toast = document.getElementById('toast');
@@ -33,6 +34,27 @@ async function blueScoutSaveCloud(progress) {
     },
     cloudUpdatedAt: firebase.firestore.FieldValue.serverTimestamp()
   }, { merge: true });
+  await blueScoutDb.collection('rankings').doc(user.uid).set({
+    uid: user.uid,
+    displayName: user.displayName || 'BLUE SCOUT 탐험가',
+    weeklyPoints: Number(progress.weeklyPoints) || 0,
+    records: Number(progress.records) || 0,
+    level: Number(progress.level) || 1,
+    weekId: progress.weekId || '',
+    updatedAt: firebase.firestore.FieldValue.serverTimestamp()
+  }, { merge: true });
+}
+
+function blueScoutWatchRanking(user) {
+  if (blueScoutRankingUnsubscribe) blueScoutRankingUnsubscribe();
+  blueScoutRankingUnsubscribe = blueScoutDb.collection('rankings')
+    .limit(100)
+    .onSnapshot((snapshot) => {
+      const players = snapshot.docs.map((doc) => doc.data());
+      if (window.renderBlueScoutSharedRanking) {
+        window.renderBlueScoutSharedRanking(players, user ? user.uid : '');
+      }
+    }, () => blueScoutAuthMessage('전체 랭킹을 불러오지 못했어요.'));
 }
 
 window.addEventListener('blue-scout-progress', (event) => {
@@ -69,11 +91,16 @@ blueScoutAuth.onAuthStateChanged(async (user) => {
   if (!user) {
     button.textContent = 'Google 로그인';
     label.textContent = '체험 모드';
+    if (blueScoutRankingUnsubscribe) {
+      blueScoutRankingUnsubscribe();
+      blueScoutRankingUnsubscribe = null;
+    }
     return;
   }
 
   button.textContent = '로그아웃';
   label.textContent = user.displayName || user.email || '로그인됨';
+  blueScoutWatchRanking(user);
 
   try {
     const ref = blueScoutDb.collection('users').doc(user.uid);
