@@ -3,23 +3,44 @@ const BLUE_SCOUT_INVASIVE_REPORT_URL = 'https://kias.nie.re.kr/page/report/guide
 const BLUE_SCOUT_ENDANGERED_INFO_URL = 'https://species.nibr.go.kr/endangeredspecies/rehome/exlist/exlist.jsp';
 
 async function imageData(file) {
-  const bitmap = await createImageBitmap(file);
-  const maxSide = 1280;
-  const scale = Math.min(1, maxSide / Math.max(bitmap.width, bitmap.height));
-  const width = Math.max(1, Math.round(bitmap.width * scale));
-  const height = Math.max(1, Math.round(bitmap.height * scale));
-  const canvas = document.createElement('canvas');
-  canvas.width = width;
-  canvas.height = height;
-  const context = canvas.getContext('2d', { alpha: false });
-  context.fillStyle = '#ffffff';
-  context.fillRect(0, 0, width, height);
-  context.drawImage(bitmap, 0, 0, width, height);
-  bitmap.close();
-  const previewUrl = canvas.toDataURL('image/jpeg', 0.8);
-  const [, data = ''] = previewUrl.split(',');
-  if (!data) throw new Error('사진을 읽을 수 없어요.');
-  return { data, mimeType: 'image/jpeg', previewUrl };
+  const originalUrl = await new Promise((resolve, reject) => {
+    const reader = new FileReader();
+    reader.onerror = () => reject(new Error('사진을 읽을 수 없어요.'));
+    reader.onload = () => resolve(String(reader.result));
+    reader.readAsDataURL(file);
+  });
+
+  try {
+    const image = await new Promise((resolve, reject) => {
+      const element = new Image();
+      element.onload = () => resolve(element);
+      element.onerror = () => reject(new Error('사진 형식을 읽을 수 없어요.'));
+      element.src = originalUrl;
+    });
+    const maxSide = 1280;
+    const scale = Math.min(1, maxSide / Math.max(image.naturalWidth, image.naturalHeight));
+    const width = Math.max(1, Math.round(image.naturalWidth * scale));
+    const height = Math.max(1, Math.round(image.naturalHeight * scale));
+    const canvas = document.createElement('canvas');
+    canvas.width = width;
+    canvas.height = height;
+    const context = canvas.getContext('2d');
+    if (!context) throw new Error('사진 변환 기능을 사용할 수 없어요.');
+    context.fillStyle = '#ffffff';
+    context.fillRect(0, 0, width, height);
+    context.drawImage(image, 0, 0, width, height);
+    const previewUrl = canvas.toDataURL('image/jpeg', 0.8);
+    const [, data = ''] = previewUrl.split(',');
+    if (!data) throw new Error('사진을 변환할 수 없어요.');
+    return { data, mimeType: 'image/jpeg', previewUrl };
+  } catch (_) {
+    const [head, data = ''] = originalUrl.split(',');
+    return {
+      data,
+      mimeType: (head.match(/data:(.*?);/) || [])[1] || file.type || 'image/jpeg',
+      previewUrl: originalUrl
+    };
+  }
 }
 
 function queryResult(token) {
