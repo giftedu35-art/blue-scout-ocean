@@ -13,6 +13,7 @@
     .game-status{display:flex;gap:10px;align-items:center;background:linear-gradient(125deg,#e1f5ef,#e6f1fa);padding:13px;border-radius:15px;margin-bottom:24px}.avatar{width:43px;height:43px;display:grid;place-items:center;border-radius:50%;background:#0b777b;font-size:21px}.game-info{flex:1}.game-info p{margin:0 0 5px;font-size:10px;color:#3f686d}.game-info p b{color:#08776e}.xp-track{height:7px;background:#c7dfdd;border-radius:8px;overflow:hidden}.xp-track i{display:block;height:100%;width:62%;background:linear-gradient(90deg,#11a38e,#f4bd45);border-radius:8px}.game-info small{display:block;margin-top:4px;font-size:9px;color:#6d898c}.rank{font-size:8px;line-height:1.1;text-align:center;color:#599097;font-weight:bold}.rank b{color:#14736e;font-size:10px}.badge-title{margin-top:25px}.badges{display:flex;gap:9px;margin-top:13px;padding-bottom:4px}.badges article{flex:1;background:#fff;border-radius:12px;padding:9px;text-align:center;box-shadow:0 2px 10px #0b4e540a}.badges div{font-size:23px}.badges b,.badges small{display:block}.badges b{font-size:10px;margin-top:4px}.badges small{font-size:8px;color:#79969a;margin-top:2px}.locked-badge{opacity:.48}.locked-badge div{color:#92a9aa}.hero:after{pointer-events:none}.hero .primary{z-index:2}.result-image.has-photo{background-position:center;background-size:cover;background-repeat:no-repeat}.result-image.has-photo #resultEmoji{opacity:0}.result-photo{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;z-index:0}.result-image .confidence{z-index:2}
   </style>
 <style>.ranking-title{margin-top:24px}.ranking{margin-top:12px;padding:13px;display:flex;align-items:center;gap:11px;background:linear-gradient(120deg,#0b6472,#128b8b);border-radius:15px;color:#fff}.rank-me{width:42px;height:42px;border-radius:12px;background:#f7cb52;color:#16434a;display:flex;align-items:baseline;justify-content:center;gap:1px;font-weight:800}.rank-me span{font-size:21px}.rank-me small{font-size:9px}.rank-copy{flex:1}.rank-copy b,.rank-copy small{display:block}.rank-copy b{font-size:13px}.rank-copy small{margin-top:4px;color:#cfefea;font-size:10px}.rank-medal{font-size:27px}.rank-list{background:#fff;border-radius:0 0 14px 14px;padding:7px 12px;box-shadow:0 3px 12px #0a4b510b}.rank-list div{display:flex;align-items:center;gap:9px;padding:6px 0;font-size:10px}.rank-list b{width:14px;color:#cb9332}.rank-list span{flex:1}.rank-list em{font-style:normal;color:#578187;font-weight:bold}</style>
+<style>.filters{flex-wrap:wrap}.filters button{cursor:pointer}.filters button.selected{box-shadow:0 2px 8px #08727733}</style>
 </head>
 <body>
   <main class="app">
@@ -68,14 +69,22 @@
     <section id="bookScreen" class="hidden content book-screen">
       <button class="back" id="bookBack">← 홈으로</button><p class="eyebrow">MY BLUE BOOK</p><h1>탐험 도감</h1>
       <div class="level"><span>탐험가 레벨 4</span><i><b></b></i><strong>62%</strong></div>
-      <div class="filters"><button class="selected">전체</button><button>생물</button><button>지질</button><button>희귀</button></div>
+      <div class="filters" id="bookFilters">
+        <button class="selected" data-filter="all">전체</button>
+        <button data-filter="animal">생물</button>
+        <button data-filter="terrain">지형</button>
+        <button data-filter="invasive">외래종</button>
+        <button data-filter="rare-high">희귀도 높음</button>
+        <button data-filter="rare-medium">희귀도 보통</button>
+        <button data-filter="rare-low">희귀도 낮음</button>
+      </div>
       <p class="book-guide">희귀도는 발견 난이도, 위험도는 생태계와 사람에게 미치는 영향을 뜻해요.</p><div id="bookList"></div>
     </section>
     <nav><button id="homeNav" class="active">⌂<span>홈</span></button><button id="cameraNav" class="nav-camera">⌁</button><button id="bookNav">▤<span>도감</span></button></nav>
     <div id="toast" class="toast hidden"></div>
   </main>
   <script src="script.js"></script>
-  <script src="persistence.js?v=20260729-3"></script>
+  <script src="persistence.js?v=20260729-4"></script>
   <script src="vision-guard.js"></script>
   <script src="gemini-client.js?v=20260729-3"></script>
   <script src="custom-species.js"></script>
