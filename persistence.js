@@ -115,6 +115,8 @@ function updateSavedProgress() {
 
   if (records > 0) {
     $('badges').innerHTML = '<article><div>🐠</div><b>첫 발견</b><small>생물 1종 기록</small></article><article class="locked-badge"><div>?</div><b>바다 지킴이</b><small>위험종 안전 기록</small></article><article class="locked-badge"><div>?</div><b>희귀 추적자</b><small>희귀종 3종 기록</small></article>';
+  } else {
+    $('badges').innerHTML = '<article class="locked-badge"><div>?</div><b>첫 발견</b><small>생물 1종 기록</small></article><article class="locked-badge"><div>?</div><b>바다 지킴이</b><small>위험종 안전 기록</small></article><article class="locked-badge"><div>?</div><b>희귀 추적자</b><small>희귀종 3종 기록</small></article>';
   }
   updateRanking();
 }
@@ -149,7 +151,7 @@ function loadSavedProgress() {
 }
 
 function saveCurrentProgress() {
-  localStorage.setItem(BLUE_SCOUT_SAVE, JSON.stringify({
+  const progress = {
     points,
     xp,
     level,
@@ -159,9 +161,48 @@ function saveCurrentProgress() {
     weekId: currentWeekId(),
     weeklyPoints: rankingScore(),
     updatedAt: new Date().toISOString()
-  }));
+  };
+  localStorage.setItem(BLUE_SCOUT_SAVE, JSON.stringify(progress));
   localStorage.removeItem(BLUE_SCOUT_LEGACY_SAVE);
+  window.dispatchEvent(new CustomEvent('blue-scout-progress', {
+    detail: progress
+  }));
 }
+
+function applyBlueScoutProgress(saved) {
+  const progress = saved || {};
+  points = Number(progress.points) || 0;
+  xp = Number(progress.xp) || 0;
+  level = Number(progress.level) || 1;
+  records = Number(progress.records) || 0;
+  recorded.clear();
+  (progress.recorded || []).forEach((name) => recorded.add(name));
+  discoveredEntries = Array.isArray(progress.discoveries)
+    ? progress.discoveries
+    : [];
+  window.blueScoutWeeklyPoints = progress.weekId === currentWeekId()
+    ? Number(progress.weeklyPoints) || 0
+    : 0;
+  updateSavedProgress();
+  saveCurrentProgress();
+}
+
+window.getBlueScoutProgress = () => readSavedProgress() || {
+  points: 0,
+  xp: 0,
+  level: 1,
+  records: 0,
+  recorded: [],
+  discoveries: [],
+  weekId: currentWeekId(),
+  weeklyPoints: 0
+};
+window.applyBlueScoutProgress = applyBlueScoutProgress;
+window.clearBlueScoutLocalProgress = () => {
+  localStorage.removeItem(BLUE_SCOUT_SAVE);
+  localStorage.removeItem(BLUE_SCOUT_LEGACY_SAVE);
+  applyBlueScoutProgress(null);
+};
 
 function showRecordToast(message) {
   $('toast').textContent = message;
