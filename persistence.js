@@ -26,6 +26,36 @@ function matchesBookFilter(entry, filter) {
   return true;
 }
 
+function hydrateRecordedDiscoveries() {
+  const knownNames = new Set(discoveredEntries.map((entry) => entry.name));
+  [...recorded].forEach((name) => {
+    if (knownNames.has(name)) return;
+    const sample = samples.find((item) => item.name === name);
+    discoveredEntries.push(sample ? {
+      name: sample.name,
+      latin: sample.latin || '',
+      type: sample.type || '기록된 발견',
+      rarity: sample.rarity || '-',
+      risk: sample.risk || '-',
+      emoji: sample.emoji || '🔎',
+      description: sample.description || '',
+      guide: sample.guide || '',
+      recordedAt: ''
+    } : {
+      name,
+      latin: '',
+      type: '기록된 발견',
+      rarity: '-',
+      risk: '-',
+      emoji: '🔎',
+      description: '',
+      guide: '',
+      recordedAt: ''
+    });
+    knownNames.add(name);
+  });
+}
+
 function renderSavedBook(filter = activeBookFilter) {
   activeBookFilter = filter;
   const list = $('bookList');
@@ -259,6 +289,7 @@ function loadSavedProgress() {
   discoveredEntries = Array.isArray(saved.discoveries)
     ? saved.discoveries
     : [];
+  hydrateRecordedDiscoveries();
   records = Math.max(records, recorded.size, discoveredEntries.length);
   window.blueScoutWeeklyPoints = saved.weekId === currentWeekId() ? (Number(saved.weeklyPoints) || 0) : 0;
   updateSavedProgress();
@@ -295,6 +326,7 @@ function applyBlueScoutProgress(saved) {
   discoveredEntries = Array.isArray(progress.discoveries)
     ? progress.discoveries
     : [];
+  hydrateRecordedDiscoveries();
   records = Math.max(records, recorded.size, discoveredEntries.length);
   window.blueScoutWeeklyPoints = progress.weekId === currentWeekId()
     ? Number(progress.weeklyPoints) || 0
