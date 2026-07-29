@@ -39,9 +39,12 @@ async function analyzePhotoWithGemini(file) {
 function showAiResult(result, previewUrl) {
   if (!result.recognized) result = { ...result, name: '해양 생물로 확인되지 않았어요', latin: 'Not a marine target', category: '미확인', rarity: '-', risk: '재촬영 필요', confidence: 0, points: 0, description: '해양 생물·물고기·지질 대상을 확인하기 어려워요.', guide: '대상이 크게 보이도록 다시 촬영해 주세요.' };
   current = { name: result.name, latin: result.latin || '', type: result.category || '미확인', rarity: result.rarity || '-', risk: result.risk || '확인 필요', score: Number(result.confidence) || 0, emoji: '🔎', points: Number(result.points) || 0, xp: 80, description: result.description || '', guide: result.guide || '' };
+  const isTerrain = /지형|지질|절리|암석/.test(current.type);
   const resultVisual = $('resultVisual');
   resultVisual.style.backgroundImage = previewUrl ? `url("${previewUrl}")` : '';
   resultVisual.classList.toggle('has-photo', Boolean(previewUrl));
+  $('riskCard').classList.toggle('hidden', isTerrain);
+  $('statusGrid').style.gridTemplateColumns = isTerrain ? '1fr' : '1fr 1fr';
   $('resultEmoji').textContent=current.emoji; $('speciesName').textContent=current.name; $('latinName').textContent=current.latin; $('typeLabel').textContent=current.type; $('factType').textContent=current.type; $('rarity').textContent=current.rarity; $('rarityStatus').textContent=current.rarity; $('riskStatus').textContent=current.risk; $('confidence').textContent=current.score; $('description').textContent=current.description; $('guide').textContent=current.guide; $('rewardPoint').textContent=current.points; $('rewardXp').textContent=current.xp; $('saveRecord').disabled=!result.recognized || !current.points; screen('resultScreen');
 }
 
