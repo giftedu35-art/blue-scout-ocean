@@ -102,6 +102,7 @@ $('saveRecord').onclick = () => {
   }
 
   recorded.add(current.name);
+  $('bookStatus').textContent = '이미 찾은 발견!';
   points += Number(current.points) || 0;
   xp += Number(current.xp) || 0;
   records += 1;
