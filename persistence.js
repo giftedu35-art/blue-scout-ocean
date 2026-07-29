@@ -2,6 +2,52 @@
 // will be connected later when sign-in and a database are added.
 const BLUE_SCOUT_SAVE = 'blue-scout-progress-v2';
 const BLUE_SCOUT_LEGACY_SAVE = 'blue-scout-progress-v1';
+let discoveredEntries = [];
+
+function isTerrainEntry(entry) {
+  return /지형|지질|절리|암석/.test(entry.type || '');
+}
+
+function discoveryEmoji(entry) {
+  if (isTerrainEntry(entry)) return '🪨';
+  if (/해파리/.test(entry.name || '')) return '🪼';
+  return entry.emoji || '🐟';
+}
+
+function renderSavedBook() {
+  const list = $('bookList');
+  const entries = discoveredEntries.length
+    ? discoveredEntries
+    : [...recorded].map((name) => {
+        const sample = samples.find((item) => item.name === name);
+        return sample || {
+          name,
+          type: '기록된 발견',
+          rarity: '-',
+          risk: '-',
+          emoji: '🔎'
+        };
+      });
+
+  list.innerHTML = entries.length
+    ? entries.map((entry) => {
+        const status = isTerrainEntry(entry)
+          ? `희귀도: ${entry.rarity || '-'}`
+          : `희귀도: ${entry.rarity || '-'} · 위험도: ${entry.risk || '-'}`;
+        return `<article class="entry">
+          <div class="emoji">${discoveryEmoji(entry)}</div>
+          <section>
+            <p>${entry.type || '기록된 발견'}</p>
+            <b>${entry.name}</b>
+            <small>${status}</small>
+          </section>
+          <span class="badge">${entry.rarity || '-'}</span>
+        </article>`;
+      }).join('')
+    : '<article class="entry locked"><div class="emoji">?</div><section><p>도감이 비어 있어요</p><b>첫 탐험을 시작해 보세요</b><small>사진을 기록하면 도감이 열립니다</small></section></article>';
+
+  screen('bookScreen');
+}
 
 function currentWeekId() {
   const now = new Date();
@@ -64,6 +110,9 @@ function loadSavedProgress() {
   level = Number(saved.level) || 1;
   records = Number(saved.records) || 0;
   (saved.recorded || []).forEach((name) => recorded.add(name));
+  discoveredEntries = Array.isArray(saved.discoveries)
+    ? saved.discoveries
+    : [];
   window.blueScoutWeeklyPoints = saved.weekId === currentWeekId() ? (Number(saved.weeklyPoints) || 0) : 0;
   updateSavedProgress();
   saveCurrentProgress();
@@ -76,6 +125,7 @@ function saveCurrentProgress() {
     level,
     records,
     recorded: [...recorded],
+    discoveries: discoveredEntries,
     weekId: currentWeekId(),
     weeklyPoints: rankingScore(),
     updatedAt: new Date().toISOString()
@@ -102,6 +152,17 @@ $('saveRecord').onclick = () => {
   }
 
   recorded.add(current.name);
+  discoveredEntries.push({
+    name: current.name,
+    latin: current.latin || '',
+    type: current.type || '기록된 발견',
+    rarity: current.rarity || '-',
+    risk: current.risk || '-',
+    emoji: current.emoji || '🐟',
+    description: current.description || '',
+    guide: current.guide || '',
+    recordedAt: new Date().toISOString()
+  });
   $('bookStatus').textContent = '이미 찾은 발견!';
   points += Number(current.points) || 0;
   xp += Number(current.xp) || 0;
@@ -118,3 +179,5 @@ $('saveRecord').onclick = () => {
 };
 
 loadSavedProgress();
+$('showBook').onclick = renderSavedBook;
+$('bookNav').onclick = renderSavedBook;
